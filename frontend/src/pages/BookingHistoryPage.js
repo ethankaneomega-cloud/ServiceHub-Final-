@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import API from "../services/api";
 
 function BookingHistoryPage({ user }) {
@@ -6,7 +6,7 @@ function BookingHistoryPage({ user }) {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("All");
 
-  const fetchBookings = useCallback(async () => {
+  const fetchBookings = async () => {
     try {
       setLoading(true);
       const res = await API.get(`/bookings/user/${user.id}`);
@@ -16,11 +16,12 @@ function BookingHistoryPage({ user }) {
     } finally {
       setLoading(false);
     }
-  }, [user.id]);
+  };
 
   useEffect(() => {
     fetchBookings();
-  }, [fetchBookings]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const filteredBookings = useMemo(() => {
     if (statusFilter === "All") return bookings;
