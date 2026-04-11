@@ -11,11 +11,19 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:3000",
+  "https://servicehubeko.vercel.app",
+  "https://servicehubeko1.vercel.app",
   process.env.FRONTEND_URL
 ].filter(Boolean);
 
 app.use(cors({
-  origin: allowedOrigins,
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true
 }));
 
