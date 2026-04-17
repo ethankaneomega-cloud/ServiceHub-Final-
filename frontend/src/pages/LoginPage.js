@@ -1,71 +1,131 @@
 import React, { useState } from "react";
 import API from "../services/api";
 
-function LoginPage({ onLoginSuccess }) {
+function LoginPage({ onLoginSuccess, onGoToRegister, onBackHome }) {
   const [form, setForm] = useState({
     email: "",
-    password: ""
+    password: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!form.email || !form.password) {
-      alert("Please enter email and password");
+      alert("Please enter your email and password.");
       return;
     }
 
     try {
+      setLoading(true);
       const res = await API.post("/auth/login", form);
+
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
-      alert(res.data.message);
+
       onLoginSuccess(res.data.user);
     } catch (error) {
       alert(error.response?.data?.message || "Login failed");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="auth-centered">
-      <div className="auth-card">
-        <div className="hero-box" style={{ marginBottom: "20px" }}>
-          <h2>Welcome back</h2>
-          <p className="muted">
-            Sign in to manage your home service bookings and track appointment status.
-          </p>
+    <div className="hero-grid">
+      <section className="hero-copy">
+        <span className="service-pill">Welcome Back</span>
+        <h2>Sign in to your ServiceHub account</h2>
+        <p>
+          Continue to your customer, worker, or admin dashboard using the same
+          polished platform and role-based access flow.
+        </p>
 
-          <div className="feature-badges">
-            <span>Easy Booking</span>
-            <span>Verified Services</span>
-            <span>Quick Scheduling</span>
+        <div className="trust-strip" style={{ marginTop: "18px" }}>
+          <div className="info-card">
+            <span className="service-pill theme-default">Customers</span>
+            <h3>Book faster</h3>
+            <p>Browse services, request help, and track booking history clearly.</p>
+          </div>
+
+          <div className="info-card">
+            <span className="service-pill theme-moving">Workers</span>
+            <h3>Manage jobs</h3>
+            <p>Review open bookings, update status, and control availability.</p>
+          </div>
+
+          <div className="info-card">
+            <span className="service-pill theme-installation">Admins</span>
+            <h3>Control operations</h3>
+            <p>Review applications, manage services, and monitor bookings.</p>
           </div>
         </div>
+      </section>
 
-        <h2 className="page-title">Login</h2>
+      <section className="page-card login-page">
+        <span className="service-pill">Sign In</span>
+        <h2>Access your dashboard</h2>
+        <p>Use your registered email and password to continue.</p>
 
-        <form className="form-grid" onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="form-card">
           <input
             type="email"
             name="email"
-            placeholder="Email address"
+            placeholder="Email Address"
             value={form.email}
             onChange={handleChange}
+            required
           />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={form.password}
-            onChange={handleChange}
-          />
-          <button className="primary-btn" type="submit">Login</button>
+
+          <div className="password-field">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Password"
+              value={form.password}
+              onChange={handleChange}
+              required
+            />
+            <button
+              type="button"
+              className="eye-toggle"
+              onClick={() => setShowPassword((prev) => !prev)}
+            >
+              {showPassword ? "Hide" : "Show"}
+            </button>
+          </div>
+
+          <div className="card-actions">
+            <button className="primary-btn" type="submit" disabled={loading}>
+              {loading ? "Signing in..." : "Sign In"}
+            </button>
+
+            <button
+              className="secondary-btn"
+              type="button"
+              onClick={onGoToRegister}
+            >
+              Create Account
+            </button>
+
+            <button
+              className="secondary-btn"
+              type="button"
+              onClick={onBackHome}
+            >
+              Back Home
+            </button>
+          </div>
         </form>
-      </div>
+      </section>
     </div>
   );
 }

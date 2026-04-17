@@ -1,0 +1,194 @@
+SHOW DATABASES;
+
+USE servicehub_dn;
+SELECT DATABASE();
+SHOW TABLES;
+
+SHOW DATABASES LIKE 'servicehub%';
+
+USE `servicehub_db`;
+SELECT DATABASE();
+SHOW TABLES;
+
+USE `servicehub_db`;
+
+ALTER TABLE users
+  MODIFY role ENUM('customer','worker','admin','super_admin') NOT NULL DEFAULT 'customer',
+  ADD COLUMN approval_status ENUM('pending','approved','rejected') NOT NULL DEFAULT 'approved' AFTER role,
+  ADD COLUMN approval_notes TEXT NULL AFTER approval_status,
+  ADD COLUMN credentials_summary TEXT NULL AFTER approval_notes,
+  ADD COLUMN document_links TEXT NULL AFTER credentials_summary,
+  ADD COLUMN approved_by INT NULL AFTER document_links,
+  ADD COLUMN approved_at TIMESTAMP NULL DEFAULT NULL AFTER approved_by;
+
+ALTER TABLE services
+  ADD COLUMN image_url TEXT NULL AFTER category,
+  ADD COLUMN is_active TINYINT(1) NOT NULL DEFAULT 1 AFTER image_url;
+  
+  DESCRIBE users;
+DESCRIBE services;
+
+DESCRIBE users;
+
+USE `servicehub_db`;
+
+UPDATE users
+SET
+  role = 'super_admin',
+  approval_status = 'approved'
+WHERE email = 'admin@servicehub.com';
+
+SELECT id, full_name, email, role, approval_status
+FROM users
+WHERE email = 'admin@servicehub.com';
+
+SELECT id, full_name, email, role, approval_status
+FROM users
+WHERE email = 'admin@servicehub.com';
+
+USE `servicehub_db`;
+
+SELECT id, full_name, email, role, approval_status
+FROM users
+WHERE email IN ('worker1@test.com', 'admin1@test.com', 'admin@servicehub.com');
+
+USE `servicehub_db`;
+
+ALTER TABLE services
+MODIFY image_url LONGTEXT NULL;
+
+USE `servicehub_db`;
+
+ALTER TABLE users
+MODIFY approval_status ENUM('pending','approved','rejected','needs_resubmission') NOT NULL DEFAULT 'approved',
+ADD COLUMN service_category VARCHAR(120) NULL AFTER credentials_summary,
+ADD COLUMN valid_id_image LONGTEXT NULL AFTER service_category,
+ADD COLUMN worker_documents LONGTEXT NULL AFTER valid_id_image,
+ADD COLUMN availability_status ENUM('available','unavailable') NOT NULL DEFAULT 'unavailable' AFTER worker_documents;
+
+ALTER TABLE booking
+ADD COLUMN worker_id INT NULL AFTER user_id,
+ADD COLUMN worker_job_status ENUM('New','Accepted','In Progress','Completed','Cancelled') NOT NULL DEFAULT 'New' AFTER status,
+ADD COLUMN worker_notes TEXT NULL AFTER worker_job_status,
+ADD COLUMN rating INT NULL AFTER worker_notes,
+ADD COLUMN review_text TEXT NULL AFTER rating,
+ADD COLUMN completed_at TIMESTAMP NULL DEFAULT NULL AFTER review_text;
+
+
+
+
+
+USE `servicehub_db`;
+
+ALTER TABLE users
+MODIFY approval_status ENUM('pending','approved','rejected','needs_resubmission') NOT NULL DEFAULT 'approved';
+
+ALTER TABLE users
+ADD COLUMN service_category VARCHAR(120) NULL AFTER credentials_summary,
+ADD COLUMN valid_id_image LONGTEXT NULL AFTER service_category,
+ADD COLUMN worker_documents LONGTEXT NULL AFTER valid_id_image,
+ADD COLUMN availability_status ENUM('available','unavailable') NOT NULL DEFAULT 'unavailable' AFTER worker_documents;
+
+ALTER TABLE bookings
+ADD COLUMN worker_id INT NULL AFTER user_id,
+ADD COLUMN worker_job_status ENUM('New','Accepted','In Progress','Completed','Cancelled') NOT NULL DEFAULT 'New' AFTER status,
+ADD COLUMN worker_notes TEXT NULL AFTER worker_job_status,
+ADD COLUMN rating INT NULL AFTER worker_notes,
+ADD COLUMN review_text TEXT NULL AFTER rating,
+ADD COLUMN completed_at TIMESTAMP NULL DEFAULT NULL AFTER review_text;
+
+DESCRIBE users;
+DESCRIBE bookings;
+
+SHOW DATABASES;
+USE `servicehub_db`;
+SELECT DATABASE();
+SHOW TABLES;
+
+DESCRIBE `bookings`;
+
+USE `servicehub_db`;
+SHOW TABLES;
+
+USE `servicehub_db`;
+
+ALTER TABLE users
+MODIFY approval_status ENUM('pending','approved','rejected','needs_resubmission') NOT NULL DEFAULT 'approved',
+ADD COLUMN service_category VARCHAR(120) NULL AFTER credentials_summary,
+ADD COLUMN valid_id_image LONGTEXT NULL AFTER service_category,
+ADD COLUMN worker_documents LONGTEXT NULL AFTER valid_id_image,
+ADD COLUMN availability_status ENUM('available','unavailable') NOT NULL DEFAULT 'unavailable' AFTER worker_documents;
+
+ALTER TABLE `bookings`
+ADD COLUMN worker_id INT NULL AFTER user_id,
+ADD COLUMN worker_job_status ENUM('New','Accepted','In Progress','Completed','Cancelled') NOT NULL DEFAULT 'New' AFTER status,
+ADD COLUMN worker_notes TEXT NULL AFTER worker_job_status,
+ADD COLUMN rating INT NULL AFTER worker_notes,
+ADD COLUMN review_text TEXT NULL AFTER rating,
+ADD COLUMN completed_at TIMESTAMP NULL DEFAULT NULL AFTER review_text;
+
+
+USE `servicehub_db`;
+SHOW TABLES;
+DESCRIBE `bookings`;
+DESCRIBE `users`;
+
+USE `servicehub_db`;
+
+SELECT
+  bookings.id,
+  users.email,
+  services.service_name,
+  bookings.booking_date,
+  bookings.address,
+  bookings.notes,
+  bookings.status
+FROM bookings
+JOIN users ON bookings.user_id = users.id
+JOIN services ON bookings.service_id = services.id
+WHERE users.email = 'ethankane.omega@gmail.com'
+  AND services.service_name = 'Aircon Maintenance'
+  AND bookings.booking_date = '2003-08-27'
+  AND bookings.address = 'bakilid';
+
+DELETE bookings
+FROM bookings
+JOIN users ON bookings.user_id = users.id
+JOIN services ON bookings.service_id = services.id
+WHERE users.email = 'ethankane.omega@gmail.com'
+  AND services.service_name = 'Aircon Maintenance'
+  AND bookings.booking_date = '2003-08-27'
+  AND bookings.address = 'bakilid';
+
+
+USE `servicehub_db`;
+
+SELECT
+  bookings.id,
+  users.email,
+  services.service_name,
+  bookings.booking_date,
+  bookings.address,
+  bookings.notes,
+  bookings.status
+FROM bookings
+JOIN users ON bookings.user_id = users.id
+JOIN services ON bookings.service_id = services.id
+WHERE users.email = 'ethankane.omega@gmail.com'
+  AND services.service_name = 'Aircon Maintenance'
+  AND bookings.booking_date = '2003-08-27'
+  AND bookings.address = 'bakilid';
+
+DELETE bookings
+FROM bookings
+JOIN users ON bookings.user_id = users.id
+JOIN services ON bookings.service_id = services.id
+WHERE users.email = 'ethankane.omega@gmail.com'
+  AND services.service_name = 'Aircon Maintenance'
+  AND bookings.booking_date = '2003-08-27'
+  AND bookings.address = 'bakilid';
+  
+  USE `servicehub_db`;
+
+ALTER TABLE `bookings`
+ADD COLUMN phone_number VARCHAR(20) NULL AFTER address;

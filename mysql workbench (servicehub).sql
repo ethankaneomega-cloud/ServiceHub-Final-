@@ -123,3 +123,21 @@ USE servicehub_db;
 SELECT id, full_name, email, role
 FROM users
 WHERE role = 'admin';
+
+ALTER TABLE users
+  MODIFY role ENUM('customer','worker','admin','super_admin') NOT NULL DEFAULT 'customer',
+  ADD COLUMN approval_status ENUM('pending','approved','rejected') NOT NULL DEFAULT 'approved' AFTER role,
+  ADD COLUMN approval_notes TEXT NULL AFTER approval_status,
+  ADD COLUMN credentials_summary TEXT NULL AFTER approval_notes,
+  ADD COLUMN document_links TEXT NULL AFTER credentials_summary,
+  ADD COLUMN approved_by INT NULL AFTER document_links,
+  ADD COLUMN approved_at TIMESTAMP NULL DEFAULT NULL AFTER approved_by;
+
+ALTER TABLE users
+  ADD CONSTRAINT fk_users_approved_by
+  FOREIGN KEY (approved_by) REFERENCES users(id)
+  ON DELETE SET NULL;
+
+ALTER TABLE services
+  ADD COLUMN image_url TEXT NULL AFTER category,
+  ADD COLUMN is_active TINYINT(1) NOT NULL DEFAULT 1 AFTER image_url;

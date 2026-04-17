@@ -1,0 +1,41 @@
+ServiceHub System (notes)
+
+cd D:\ServiceHub\backend
+npm.cmd run dev
+
+cd D:\ServiceHub\frontend
+npm.cmd start
+
+GitHub repo: https://github.com/ethankaneomega-cloud/ServiceHub
+
+Vercel frontend URL: 
+https://servicehubeko.vercel.app/
+
+https://servicehub-production-cf43.up.railway.app/
+
+MySQL Workbench
+
+CN: Railway MySQL
+CM: Standard (TCP/IP)
+HN: metro.proxy.rlwy.net
+Port:24698
+Username: root
+Password: vuVImtfoMziuyaKiJzKWUsJxomcVfSEu
+DS: railway
+
+admin login: admin@servicehub.com 
+pass: admin123
+
+* Users when opening website sees system/app and info/description and on the top right side is the SIGN UP or SIGN IN
+* Separate registration (users, admin, workers)
+* Each service box/card has background image
+* Admin registration needs confirmation from higher ups
+* Workers registration needs docs, creds and after wait for confirmation from the admin side
+* Design change to minimal dark blue theme
+* Hovering back button and cards/box
+* Overall design change
+* Polish functions and features
+* In the admin side in the "manage service" add a add background picture for add service
+
+
+
