@@ -12,25 +12,48 @@ const workerRoutes = require("./routes/workerRoutes");
 
 const app = express();
 
-const allowedOrigins = [
+const normalizeOrigin = (value) => {
+  if (!value) return "";
+  return String(value).replace(/\/+$/, "");
+};
+
+const explicitAllowedOrigins = [
   "http://localhost:3000",
   "https://servicehubeko.vercel.app",
   "https://servicehubeko1.vercel.app",
-  process.env.FRONTEND_URL,
+  normalizeOrigin(process.env.FRONTEND_URL),
 ].filter(Boolean);
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
+const vercelPreviewPatterns = [
+  /^https:\/\/service-hub-final(?:-[a-z0-9-]+)*\.vercel\.app$/i,
+  /^https:\/\/servicehub-final(?:-[a-z0-9-]+)*\.vercel\.app$/i,
+];
 
-      return callback(new Error("Not allowed by CORS"));
-    },
-    credentials: true,
-  })
-);
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+
+  const cleanOrigin = normalizeOrigin(origin);
+
+  if (explicitAllowedOrigins.includes(cleanOrigin)) {
+    return true;
+  }
+
+  return vercelPreviewPatterns.some((pattern) => pattern.test(cleanOrigin));
+};
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (isAllowedOrigin(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`Not allowed by CORS: ${origin}`));
+  },
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 app.use(express.json({ limit: "15mb" }));
 app.use(express.urlencoded({ extended: true, limit: "15mb" }));
@@ -62,9 +85,9 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   console.error("Server error:", err);
 
-  if (err.message === "Not allowed by CORS") {
+  if (err.message && err.message.startsWith("Not allowed by CORS")) {
     return res.status(403).json({
-      message: "Request blocked by CORS policy",
+      message: err.message,
     });
   }
 
