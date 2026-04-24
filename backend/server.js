@@ -11,41 +11,8 @@ const workerRoutes = require("./routes/workerRoutes");
 
 const app = express();
 
-const normalizeOrigin = (value) => {
-  if (!value) return "";
-  return String(value).replace(/\/+$/, "");
-};
-
-const allowedOrigins = [
-  "http://localhost:3000",
-  normalizeOrigin(process.env.FRONTEND_URL),
-];
-
-const isAllowedOrigin = (origin) => {
-  if (!origin) return true;
-
-  const cleanOrigin = normalizeOrigin(origin);
-
-  if (allowedOrigins.includes(cleanOrigin)) {
-    return true;
-  }
-
-  if (cleanOrigin.endsWith(".vercel.app")) {
-    return true;
-  }
-
-  return false;
-};
-
 app.use((req, res, next) => {
-  const origin = req.headers.origin;
-
-  if (isAllowedOrigin(origin)) {
-    res.header("Access-Control-Allow-Origin", origin || "*");
-  }
-
-  res.header("Vary", "Origin");
-  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Access-Control-Allow-Origin", "*");
   res.header(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept, Authorization"
