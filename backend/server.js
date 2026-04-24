@@ -24,11 +24,6 @@ const explicitAllowedOrigins = [
   normalizeOrigin(process.env.FRONTEND_URL),
 ].filter(Boolean);
 
-const vercelPreviewPatterns = [
-  /^https:\/\/service-hub-final(?:-[a-z0-9-]+)*\.vercel\.app$/i,
-  /^https:\/\/servicehub-final(?:-[a-z0-9-]+)*\.vercel\.app$/i,
-];
-
 const isAllowedOrigin = (origin) => {
   if (!origin) return true;
 
@@ -38,7 +33,11 @@ const isAllowedOrigin = (origin) => {
     return true;
   }
 
-  return vercelPreviewPatterns.some((pattern) => pattern.test(cleanOrigin));
+  if (cleanOrigin.endsWith(".vercel.app")) {
+    return true;
+  }
+
+  return false;
 };
 
 const corsOptions = {
@@ -47,13 +46,15 @@ const corsOptions = {
       return callback(null, true);
     }
 
-    return callback(new Error(`Not allowed by CORS: ${origin}`));
+    return callback(null, false);
   },
   credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+app.options(/.*/, cors(corsOptions));
 
 app.use(express.json({ limit: "15mb" }));
 app.use(express.urlencoded({ extended: true, limit: "15mb" }));
@@ -84,12 +85,6 @@ app.use((req, res) => {
 
 app.use((err, req, res, next) => {
   console.error("Server error:", err);
-
-  if (err.message && err.message.startsWith("Not allowed by CORS")) {
-    return res.status(403).json({
-      message: err.message,
-    });
-  }
 
   return res.status(500).json({
     message: "Internal server error",
