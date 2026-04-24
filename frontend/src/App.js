@@ -11,14 +11,14 @@ import AdminManageServicesPage from "./pages/AdminManageServicesPage";
 import WorkerDashboardPage from "./pages/WorkerDashboardPage";
 import "./App.css";
 
+const isStaffRole = (role) => role === "admin" || role === "super_admin";
+const isWorkerRole = (role) => role === "worker";
+const isCustomerRole = (role) => role && !isStaffRole(role) && !isWorkerRole(role);
+
 function App() {
   const [page, setPage] = useState("landing");
   const [user, setUser] = useState(null);
   const [selectedService, setSelectedService] = useState(null);
-
-  const isStaffRole = (role) => role === "admin" || role === "super_admin";
-  const isWorkerRole = (role) => role === "worker";
-  const isCustomerRole = (role) => role && !isStaffRole(role) && !isWorkerRole(role);
 
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
