@@ -55,12 +55,13 @@ const registerCustomer = async (req, res) => {
       db.query(
         `
           INSERT INTO users
-          (full_name, email, password, role, approval_status)
-          VALUES (?, ?, ?, 'customer', 'approved')
+          (full_name, email, password, role, approval_status, availability_status)
+          VALUES (?, ?, ?, ?, ?, ?)
         `,
-        [full_name, email, hashedPassword],
+        [full_name, email, hashedPassword, "customer", "approved", "unavailable"],
         (insertErr, result) => {
           if (insertErr) {
+            console.error("registerCustomer insert error:", insertErr);
             return res.status(500).json({
               message: "Failed to register user",
               error: insertErr.message,
@@ -134,6 +135,7 @@ const registerWorker = async (req, res) => {
             password,
             role,
             approval_status,
+            approval_notes,
             credentials_summary,
             document_links,
             service_category,
@@ -141,20 +143,25 @@ const registerWorker = async (req, res) => {
             worker_documents,
             availability_status
           )
-          VALUES (?, ?, ?, 'worker', 'pending', ?, ?, ?, ?, ?, 'unavailable')
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `,
         [
           full_name,
           email,
           hashedPassword,
+          "worker",
+          "pending",
+          null,
           credentials_summary,
           document_links || null,
           service_category,
           valid_id_image,
           worker_documents,
+          "unavailable",
         ],
         (insertErr, result) => {
           if (insertErr) {
+            console.error("registerWorker insert error:", insertErr);
             return res.status(500).json({
               message: "Failed to submit worker application",
               error: insertErr.message,
@@ -212,14 +219,27 @@ const registerAdmin = async (req, res) => {
             password,
             role,
             approval_status,
+            approval_notes,
             credentials_summary,
-            document_links
+            document_links,
+            availability_status
           )
-          VALUES (?, ?, ?, 'admin', 'pending', ?, ?)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         `,
-        [full_name, email, hashedPassword, credentials_summary, document_links || null],
+        [
+          full_name,
+          email,
+          hashedPassword,
+          "admin",
+          "pending",
+          null,
+          credentials_summary,
+          document_links || null,
+          "unavailable",
+        ],
         (insertErr, result) => {
           if (insertErr) {
+            console.error("registerAdmin insert error:", insertErr);
             return res.status(500).json({
               message: "Failed to submit admin application",
               error: insertErr.message,
