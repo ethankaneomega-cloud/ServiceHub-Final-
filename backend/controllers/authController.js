@@ -56,7 +56,7 @@ const registerCustomer = async (req, res) => {
         `
           INSERT INTO users
           (full_name, email, password, role, approval_status)
-          VALUES (?, ?, ?, 'user', 'approved')
+          VALUES (?, ?, ?, 'customer', 'approved')
         `,
         [full_name, email, hashedPassword],
         (insertErr, result) => {
@@ -162,7 +162,8 @@ const registerWorker = async (req, res) => {
           }
 
           return res.status(201).json({
-            message: "Worker application submitted successfully. Please wait for admin review.",
+            message:
+              "Worker application submitted successfully. Please wait for admin review.",
             userId: result.insertId,
           });
         }
@@ -226,7 +227,8 @@ const registerAdmin = async (req, res) => {
           }
 
           return res.status(201).json({
-            message: "Admin application submitted successfully. Higher-up approval is required.",
+            message:
+              "Admin application submitted successfully. Higher-up approval is required.",
             userId: result.insertId,
           });
         }
