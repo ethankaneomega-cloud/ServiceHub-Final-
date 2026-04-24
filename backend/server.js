@@ -1,5 +1,4 @@
 const express = require("express");
-const cors = require("cors");
 require("dotenv").config();
 
 require("./config/db");
@@ -17,19 +16,17 @@ const normalizeOrigin = (value) => {
   return String(value).replace(/\/+$/, "");
 };
 
-const explicitAllowedOrigins = [
+const allowedOrigins = [
   "http://localhost:3000",
-  "https://servicehubeko.vercel.app",
-  "https://servicehubeko1.vercel.app",
   normalizeOrigin(process.env.FRONTEND_URL),
-].filter(Boolean);
+];
 
 const isAllowedOrigin = (origin) => {
   if (!origin) return true;
 
   const cleanOrigin = normalizeOrigin(origin);
 
-  if (explicitAllowedOrigins.includes(cleanOrigin)) {
+  if (allowedOrigins.includes(cleanOrigin)) {
     return true;
   }
 
@@ -40,21 +37,30 @@ const isAllowedOrigin = (origin) => {
   return false;
 };
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (isAllowedOrigin(origin)) {
-      return callback(null, true);
-    }
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
 
-    return callback(null, false);
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-};
+  if (isAllowedOrigin(origin)) {
+    res.header("Access-Control-Allow-Origin", origin || "*");
+  }
 
-app.use(cors(corsOptions));
-app.options(/.*/, cors(corsOptions));
+  res.header("Vary", "Origin");
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+  );
+
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+
+  next();
+});
 
 app.use(express.json({ limit: "15mb" }));
 app.use(express.urlencoded({ extended: true, limit: "15mb" }));
